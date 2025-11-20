@@ -7,10 +7,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    
     <script src="https://js.stripe.com/v3/"></script>
     
-    <script src="https://www.paypal.com/sdk/js?client-id=AQZqlPMOnKH_Yx6NVKRw6jnyami-Ncok_2X2PWis-zCcE...&currency=EUR"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AQZqIPM0nKH_Yx6NVKRw6jnyami-Ncok_2X2PWis-zCcBjJZx9aiXfcOEQ-o6bAc4ePUq1jOHUc2s0bv&currency=EUR"></script>
 </head>
 <body>
 
@@ -35,7 +34,7 @@
         </ul>
         <div class="nav-icons">
             <i class="fas fa-search"></i>
-            <i class="fas fa-user"></i>
+            <i class="fas fa-user" id="login-btn-trigger" title="Login"></i>
             <div class="cart-icon-wrapper" id="cart-btn">
                 <i class="fas fa-shopping-bag"></i>
                 <span class="cart-count">0</span>
@@ -98,31 +97,55 @@
         </div>
     </div>
 
+    <div id="login-modal" class="modal-overlay">
+        <div class="login-box glass-panel">
+            <span class="close-modal" id="close-login">&times;</span>
+            <h2>Member Login</h2>
+            <p id="auth-info-text" style="font-size: 0.9rem; margin-bottom: 20px; color:#aaa;">Melde dich an für schnelleren Checkout.</p>
+            <form id="login-form">
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="auth-email" placeholder="E-Mail Adresse" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="auth-password" placeholder="Passwort" required>
+                </div>
+                <button type="submit" class="cta-btn login-btn">Einloggen</button>
+                <p class="switch-text"><a href="#" id="toggle-auth">Neu bei JM? Kostenlos registrieren</a></p>
+            </form>
+        </div>
+    </div>
+
     <div id="checkout-modal" class="modal-overlay">
         <div class="checkout-box glass-panel">
             <span class="close-modal" id="close-checkout">&times;</span>
-            <h2>Sichere Kasse</h2>
+            <h2><i class="fas fa-lock"></i> Sicher bezahlen</h2>
             
             <form id="checkout-form">
+                <h4 class="form-heading">Lieferadresse</h4>
                 <div class="form-row">
-                    <input type="text" placeholder="Name" required class="full-width">
+                    <input type="text" placeholder="Vorname" required>
+                    <input type="text" placeholder="Nachname" required>
                 </div>
-                <input type="text" placeholder="Adresse" required class="full-width">
-                
-                <h4 style="margin: 20px 0 10px; border-bottom:1px solid #333;">Zahlungsmethode wählen</h4>
+                <input type="text" placeholder="Straße & Hausnummer" required class="full-width">
+                <div class="form-row three-cols">
+                    <input type="text" placeholder="PLZ" required>
+                    <input type="text" placeholder="Stadt" required>
+                    <input type="text" placeholder="Land" value="Deutschland" required>
+                </div>
 
-                <div id="paypal-button-container" style="margin-bottom: 25px;"></div>
-
-                <p style="text-align:center; margin-bottom:15px; color:#888; font-size:0.8rem;">— ODER KREDITKARTE / KLARNA —</p>
-
-                <div id="stripe-payment-element"></div>
+                <h4 class="form-heading">Zahlungsart</h4>
+                <div id="paypal-button-container" style="margin-bottom: 20px;"></div>
+                <p class="divider-text">— ODER KARTE / KLARNA —</p>
+                <div id="stripe-payment-element" class="stripe-box"></div>
                 <div id="payment-message" style="color: #ff4444; display: none; margin-top: 10px;"></div>
 
                 <div class="total-summary">
-                    <p>Betrag: <strong id="checkout-total-amount">0.00 €</strong></p>
+                    <p>Summe: <strong id="checkout-total-amount">0.00 €</strong></p>
                 </div>
 
-                <button type="submit" class="pay-now-btn" id="submit-payment">Mit Karte bezahlen</button>
+                <button type="submit" class="pay-now-btn" id="submit-payment">Kostenpflichtig bestellen</button>
             </form>
         </div>
     </div>
