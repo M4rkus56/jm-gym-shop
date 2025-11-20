@@ -4,11 +4,16 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const path = require("path"); // NEU: Hilft beim Finden der Dateien
+const path = require("path"); // Wichtig für Pfade
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const paypal = require("@paypal/checkout-server-sdk");
 
 const app = express();
+
+// --- DIAGNOSE (Wird in den Kinsta Logs angezeigt) ---
+const publicPath = path.join(__dirname, 'public');
+console.log("Server startet...");
+console.log("Suche Dateien in diesem Ordner:", publicPath);
 
 // --- 1. DATENBANK VERBINDEN ---
 mongoose.connect(process.env.MONGO_URI)
@@ -30,60 +35,54 @@ const paypalClient = new paypal.core.PayPalHttpClient(
 );
 
 // --- 4. MIDDLEWARE ---
-app.use(express.static("public")); // Sagt dem Server: Dateien liegen in 'public'
 app.use(express.json());
 app.use(cors());
 
-// --- WICHTIG: ROUTE FÜR DIE STARTSEITE ---
-// Das behebt den "Cannot GET /" Fehler!
+// Statische Dateien laden (CSS, Bilder, JS)
+app.use(express.static(publicPath));
+
+// --- WICHTIG: ROUTE FÜR DIE STARTSEITE (Mit Fehlermeldung) ---
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    const indexPath = path.join(publicPath, "index.html");
+    
+    res.sendFile(indexPath, (err) => {
+        if (err) {
+            console.error("FEHLER beim Laden der index.html:", err);
+            res.status(500).send("Fehler: Die Datei index.html wurde nicht gefunden. Pfad: " + indexPath);
+        }
+    });
 });
 
-
 // --- 5. AUTH ROUTEN ---
-
-// Registrieren
 app.post("/register", async (req, res) => {
     const { email, password } = req.body;
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ message: "E-Mail bereits vergeben." });
-
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({ email, password: hashedPassword });
         await user.save();
-
         res.status(201).json({ message: "Benutzer erstellt!" });
-    } catch (error) {
-        res.status(500).json({ message: "Fehler beim Registrieren" });
-    }
+    } catch (error) { res.status(500).json({ message: "Fehler beim Registrieren" }); }
 });
 
-// Login
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: "Benutzer nicht gefunden." });
-
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: "Falsches Passwort." });
-
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
         res.json({ token, email: user.email });
-    } catch (error) {
-        res.status(500).json({ message: "Login Fehler" });
-    }
+    } catch (error) { res.status(500).json({ message: "Login Fehler" }); }
 });
 
 // --- 6. PAYMENT ROUTEN ---
-
 app.get("/config", (req, res) => {
   res.send({ stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY });
 });
 
-// Stripe
 app.post("/create-payment-intent", async (req, res) => {
   const { amount } = req.body;
   try {
@@ -93,12 +92,9 @@ app.post("/create-payment-intent", async (req, res) => {
       automatic_payment_methods: { enabled: true },
     });
     res.send({ clientSecret: paymentIntent.client_secret });
-  } catch (e) {
-    res.status(400).send({ error: { message: e.message } });
-  }
+  } catch (e) { res.status(400).send({ error: { message: e.message } }); }
 });
 
-// PayPal Create
 app.post("/create-paypal-order", async (req, res) => {
   const { amount } = req.body;
   const request = new paypal.orders.OrdersCreateRequest();
@@ -113,7 +109,6 @@ app.post("/create-paypal-order", async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// PayPal Capture
 app.post("/capture-paypal-order", async (req, res) => {
   const { orderID } = req.body;
   const request = new paypal.orders.OrdersCaptureRequest(orderID);
