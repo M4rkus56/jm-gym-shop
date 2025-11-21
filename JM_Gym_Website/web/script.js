@@ -8,114 +8,110 @@ const cartCountElement = document.querySelector('.cart-count');
 const checkoutModal = document.getElementById('checkout-modal');
 const loginModal = document.getElementById('login-modal');
 
-// --- INIT ---
-document.addEventListener("DOMContentLoaded", async () => {
-    const response = await fetch("/config");
-    const { stripePublishableKey } = await response.json();
-    stripe = Stripe(stripePublishableKey);
-    checkLoginStatus();
-    if(!sessionStorage.getItem('popupClosed')) setTimeout(() => document.getElementById('promo-popup').classList.add('show'), 2500);
-});
+// --- GLOBALE FUNKTIONEN (Für HTML onclick) ---
+window.addToCart = function(n, p) { cart.push({name:n, price:p}); updateCartDisplay(); if(cartSidebar) cartSidebar.classList.add('open'); }
+window.removeFromCart = function(i) { cart.splice(i, 1); updateCartDisplay(); }
 
-// --- NEUE AUTH LOGIK (Tabs) ---
-const tabLogin = document.getElementById('tab-login');
-const tabRegister = document.getElementById('tab-register');
-const authBtn = document.getElementById('auth-action-btn');
-
-tabLogin.addEventListener('click', () => {
-    isRegisterMode = false;
-    tabLogin.classList.add('active');
-    tabRegister.classList.remove('active');
-    authBtn.innerText = "Einloggen";
-});
-
-tabRegister.addEventListener('click', () => {
-    isRegisterMode = true;
-    tabRegister.classList.add('active');
-    tabLogin.classList.remove('active');
-    authBtn.innerText = "Registrieren";
-});
-
-document.getElementById('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-    const endpoint = isRegisterMode ? "/register" : "/login";
+function updateCartDisplay() {
+    const container = document.getElementById('cart-items');
+    const totalEl = document.getElementById('cart-total');
+    const countEl = document.querySelector('.cart-count');
+    container.innerHTML = ''; total = 0;
     
+    if(cart.length === 0) container.innerHTML = '<p style="text-align:center; color:#888;">Dein Warenkorb ist leer.</p>';
+    else cart.forEach((item, i) => {
+        total += item.price;
+        const div = document.createElement('div'); div.classList.add('cart-item');
+        div.innerHTML = `<span>${item.name}</span> <div style="display:flex; gap:10px;"><span>${item.price.toFixed(2)}€</span> <i class="fas fa-trash" onclick="window.removeFromCart(${i})" style="color:#ff4444; cursor:pointer;"></i></div>`;
+        container.appendChild(div);
+    });
+    
+    if (discountApplied) total *= 0.9;
+    if(totalEl) totalEl.innerText = total.toFixed(2) + ' €';
+    if(countEl) countEl.innerText = cart.length;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
     try {
-        const res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
-        const data = await res.json();
+        const response = await fetch("/config");
+        const { stripePublishableKey } = await response.json();
+        stripe = Stripe(stripePublishableKey);
+    } catch(e){}
+    
+    checkLoginStatus();
+    
+    if(!sessionStorage.getItem('popupClosed')) {
+        setTimeout(() => { const p = document.getElementById('promo-popup'); if(p) p.classList.add('show'); }, 2500);
+    }
+
+    // UI Listener
+    const cartBtn = document.getElementById('cart-btn');
+    const closeCart = document.getElementById('close-cart');
+    if(cartBtn) cartBtn.addEventListener('click', () => cartSidebar.classList.add('open'));
+    if(closeCart) closeCart.addEventListener('click', () => cartSidebar.classList.remove('open'));
+
+    const loginTrig = document.getElementById('login-btn-trigger');
+    const closeLogin = document.getElementById('close-login');
+    if(loginTrig) loginTrig.addEventListener('click', () => { if(!localStorage.getItem('token')) loginModal.style.display='flex'; });
+    if(closeLogin) closeLogin.addEventListener('click', () => loginModal.style.display='none');
+
+    const closeCheck = document.getElementById('close-checkout');
+    if(closeCheck) closeCheck.addEventListener('click', () => checkoutModal.style.display='none');
+    
+    const closePop = document.getElementById('close-popup');
+    if(closePop) closePop.addEventListener('click', () => { document.getElementById('promo-popup').classList.remove('show'); sessionStorage.setItem('popupClosed','true'); });
+
+    // Auth Tabs
+    const tabLogin = document.getElementById('tab-login');
+    const tabRegister = document.getElementById('tab-register');
+    const authBtn = document.getElementById('auth-action-btn');
+    
+    if(tabLogin) tabLogin.addEventListener('click', () => { isRegisterMode = false; tabLogin.classList.add('active'); tabRegister.classList.remove('active'); authBtn.innerText = "Einloggen"; });
+    if(tabRegister) tabRegister.addEventListener('click', () => { isRegisterMode = true; tabRegister.classList.add('active'); tabLogin.classList.remove('active'); authBtn.innerText = "Registrieren"; });
+
+    // Login Submit
+    const loginForm = document.getElementById('login-form');
+    if(loginForm) loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('auth-email').value;
+        const password = document.getElementById('auth-password').value;
+        const endpoint = isRegisterMode ? "/register" : "/login";
+        try {
+            const res = await fetch(endpoint, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email, password}) });
+            const data = await res.json();
+            if(res.ok) {
+                if(isRegisterMode) { alert("Registriert! Bitte einloggen."); tabLogin.click(); }
+                else { localStorage.setItem('token', data.token); localStorage.setItem('user', data.email); alert("Willkommen!"); loginModal.style.display='none'; checkLoginStatus(); }
+            } else alert(data.message);
+        } catch(err) { alert("Fehler"); }
+    });
+
+    // Checkout
+    const checkBtn = document.getElementById('checkout-btn');
+    if(checkBtn) checkBtn.addEventListener('click', async () => {
+        if(cart.length === 0) return alert("Warenkorb leer");
+        cartSidebar.classList.remove('open'); checkoutModal.style.display='flex';
+        document.getElementById('checkout-total-amount').innerText = total.toFixed(2) + ' €';
         
-        if (res.ok) {
-            if (isRegisterMode) { 
-                alert("Account erstellt! Bitte jetzt einloggen."); 
-                tabLogin.click(); // Wechsel zum Login Tab
-            } else { 
-                localStorage.setItem('token', data.token); 
-                localStorage.setItem('user', data.email); 
-                alert("Willkommen zurück!"); 
-                loginModal.style.display = 'none'; 
-                checkLoginStatus(); 
-            }
-        } else { alert(data.message); }
-    } catch (err) { alert("Server Fehler"); }
+        const res = await fetch("/create-payment-intent", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({amount:total}) });
+        const {clientSecret} = await res.json();
+        elements = stripe.elements({ clientSecret, appearance: { theme: 'night' } });
+        elements.create("payment").mount("#stripe-payment-element");
+        
+        document.getElementById('paypal-button-container').innerHTML = "";
+        paypal.Buttons({
+            style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal' },
+            createOrder: (d,a) => fetch("/create-paypal-order", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:total})}).then(r=>r.json()).then(d=>d.id),
+            onApprove: (d,a) => fetch("/capture-paypal-order", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({orderID:d.orderID})}).then(r=>r.json()).then(()=>{ alert("Danke!"); checkoutModal.style.display='none'; cart=[]; updateCartDisplay(); })
+        }).render('#paypal-button-container');
+    });
 });
 
 function checkLoginStatus() {
-    const token = localStorage.getItem('token');
+    const t = localStorage.getItem('token');
     const icon = document.getElementById('login-btn-trigger');
-    if (token) {
-        icon.style.color = "#00ff88"; icon.title = "Eingeloggt: " + localStorage.getItem('user');
-        icon.onclick = () => { if(confirm("Ausloggen?")) { localStorage.clear(); location.reload(); } };
-    } else {
-        icon.style.color = "white"; icon.onclick = () => loginModal.style.display = 'flex';
+    if(t && icon) {
+        icon.style.color = "#00ff88"; icon.title = "User: " + localStorage.getItem('user');
+        icon.onclick = (e) => { e.stopImmediatePropagation(); if(confirm("Ausloggen?")) { localStorage.clear(); location.reload(); } };
     }
 }
-
-// Schließen
-document.getElementById('close-login').addEventListener('click', () => loginModal.style.display = 'none');
-document.getElementById('close-checkout').addEventListener('click', () => checkoutModal.style.display = 'none');
-document.getElementById('close-popup').addEventListener('click', () => { document.getElementById('promo-popup').classList.remove('show'); sessionStorage.setItem('popupClosed', 'true'); });
-
-// --- SHOP ---
-function addToCart(n, p) { cart.push({name:n, price:p}); updateCartDisplay(); cartSidebar.classList.add('open'); }
-function removeFromCart(i) { cart.splice(i, 1); updateCartDisplay(); }
-function updateCartDisplay() {
-    cartItemsContainer.innerHTML = ''; total = 0;
-    if(cart.length === 0) cartItemsContainer.innerHTML = '<p>Leer.</p>';
-    else cart.forEach((item, i) => {
-        total += item.price;
-        cartItemsContainer.innerHTML += `<div><span>${item.name}</span> <span>${item.price}€</span> <span onclick="removeFromCart(${i})" style="color:red;cursor:pointer">X</span></div>`;
-    });
-    if (discountApplied) total *= 0.9;
-    cartTotalElement.innerText = total.toFixed(2) + ' €'; cartCountElement.innerText = cart.length;
-}
-document.getElementById('cart-btn').addEventListener('click', () => cartSidebar.classList.add('open'));
-document.getElementById('close-cart').addEventListener('click', () => cartSidebar.classList.remove('open'));
-document.getElementById('apply-discount').addEventListener('click', () => {
-    if(document.getElementById('discount-input').value.toUpperCase() === 'JM10' && !discountApplied) { discountApplied = true; updateCartDisplay(); }
-});
-
-// --- CHECKOUT ---
-document.getElementById('checkout-btn').addEventListener('click', async () => {
-    if(cart.length === 0) return alert("Leer!");
-    cartSidebar.classList.remove('open'); checkoutModal.style.display = 'flex';
-    document.getElementById('checkout-total-amount').innerText = total.toFixed(2) + ' €';
-    const res = await fetch("/create-payment-intent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amount: total }) });
-    const { clientSecret } = await res.json();
-    elements = stripe.elements({ clientSecret, appearance: { theme: 'night' } });
-    elements.create("payment").mount("#stripe-payment-element");
-    
-    document.getElementById('paypal-button-container').innerHTML = "";
-    paypal.Buttons({
-        style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal' },
-        createOrder: (d, a) => fetch("/create-paypal-order", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({amount:total}) }).then(r => r.json()).then(d => d.id),
-        onApprove: (d, a) => fetch("/capture-paypal-order", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({orderID: d.orderID}) }).then(r => r.json()).then(() => { alert("Zahlung erfolgreich!"); checkoutModal.style.display = 'none'; cart=[]; updateCartDisplay(); })
-    }).render('#paypal-button-container');
-});
-
-document.getElementById('checkout-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const { error } = await stripe.confirmPayment({ elements, confirmParams: { return_url: window.location.href } });
-    if(error) alert(error.message);
-});
