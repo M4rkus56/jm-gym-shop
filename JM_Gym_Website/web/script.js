@@ -8,29 +8,7 @@ const cartCountElement = document.querySelector('.cart-count');
 const checkoutModal = document.getElementById('checkout-modal');
 const loginModal = document.getElementById('login-modal');
 
-// --- GLOBALE FUNKTIONEN (Für HTML onclick) ---
-window.addToCart = function(n, p) { cart.push({name:n, price:p}); updateCartDisplay(); if(cartSidebar) cartSidebar.classList.add('open'); }
-window.removeFromCart = function(i) { cart.splice(i, 1); updateCartDisplay(); }
-
-function updateCartDisplay() {
-    const container = document.getElementById('cart-items');
-    const totalEl = document.getElementById('cart-total');
-    const countEl = document.querySelector('.cart-count');
-    container.innerHTML = ''; total = 0;
-    
-    if(cart.length === 0) container.innerHTML = '<p style="text-align:center; color:#888;">Dein Warenkorb ist leer.</p>';
-    else cart.forEach((item, i) => {
-        total += item.price;
-        const div = document.createElement('div'); div.classList.add('cart-item');
-        div.innerHTML = `<span>${item.name}</span> <div style="display:flex; gap:10px;"><span>${item.price.toFixed(2)}€</span> <i class="fas fa-trash" onclick="window.removeFromCart(${i})" style="color:#ff4444; cursor:pointer;"></i></div>`;
-        container.appendChild(div);
-    });
-    
-    if (discountApplied) total *= 0.9;
-    if(totalEl) totalEl.innerText = total.toFixed(2) + ' €';
-    if(countEl) countEl.innerText = cart.length;
-}
-
+// --- INIT ---
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const response = await fetch("/config");
@@ -40,11 +18,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     checkLoginStatus();
     
-    if(!sessionStorage.getItem('popupClosed')) {
-        setTimeout(() => { const p = document.getElementById('promo-popup'); if(p) p.classList.add('show'); }, 2500);
-    }
-
-    // UI Listener
     const cartBtn = document.getElementById('cart-btn');
     const closeCart = document.getElementById('close-cart');
     if(cartBtn) cartBtn.addEventListener('click', () => cartSidebar.classList.add('open'));
@@ -57,9 +30,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const closeCheck = document.getElementById('close-checkout');
     if(closeCheck) closeCheck.addEventListener('click', () => checkoutModal.style.display='none');
-    
-    const closePop = document.getElementById('close-popup');
-    if(closePop) closePop.addEventListener('click', () => { document.getElementById('promo-popup').classList.remove('show'); sessionStorage.setItem('popupClosed','true'); });
 
     // Auth Tabs
     const tabLogin = document.getElementById('tab-login');
@@ -86,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch(err) { alert("Fehler"); }
     });
 
-    // Checkout
+    // Checkout Start
     const checkBtn = document.getElementById('checkout-btn');
     if(checkBtn) checkBtn.addEventListener('click', async () => {
         if(cart.length === 0) return alert("Warenkorb leer");
@@ -105,7 +75,36 @@ document.addEventListener("DOMContentLoaded", async () => {
             onApprove: (d,a) => fetch("/capture-paypal-order", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({orderID:d.orderID})}).then(r=>r.json()).then(()=>{ alert("Danke!"); checkoutModal.style.display='none'; cart=[]; updateCartDisplay(); })
         }).render('#paypal-button-container');
     });
+
+    document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const { error } = await stripe.confirmPayment({ elements, confirmParams: { return_url: window.location.href } });
+        if(error) alert(error.message);
+    });
 });
+
+// Globale Funktionen für HTML onclick
+window.addToCart = function(n, p) { cart.push({name:n, price:p}); updateCartDisplay(); if(cartSidebar) cartSidebar.classList.add('open'); }
+window.removeFromCart = function(i) { cart.splice(i, 1); updateCartDisplay(); }
+
+function updateCartDisplay() {
+    const container = document.getElementById('cart-items');
+    const totalEl = document.getElementById('cart-total');
+    const countEl = document.querySelector('.cart-count');
+    container.innerHTML = ''; total = 0;
+    
+    if(cart.length === 0) container.innerHTML = '<p style="text-align:center; color:#888;">Dein Warenkorb ist leer.</p>';
+    else cart.forEach((item, i) => {
+        total += item.price;
+        const div = document.createElement('div'); div.classList.add('cart-item');
+        div.innerHTML = `<span>${item.name}</span> <div style="display:flex; gap:10px;"><span>${item.price.toFixed(2)}€</span> <i class="fas fa-trash" onclick="window.removeFromCart(${i})" style="color:#ff4444; cursor:pointer;"></i></div>`;
+        container.appendChild(div);
+    });
+    
+    if (discountApplied) total *= 0.9;
+    if(totalEl) totalEl.innerText = total.toFixed(2) + ' €';
+    if(countEl) countEl.innerText = cart.length;
+}
 
 function checkLoginStatus() {
     const t = localStorage.getItem('token');
