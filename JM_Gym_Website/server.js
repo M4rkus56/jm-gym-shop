@@ -13,7 +13,7 @@ const app = express();
 
 // --- 1. DIAGNOSE & PFAD SETUP ---
 // Wir definieren den Pfad zum neuen Ordner 'frontend'
-const publicPath = path.join(__dirname, 'frontend');
+const publicPath = path.join(__dirname, 'web');
 
 console.log("--- SERVER START CHECK ---");
 console.log("Hauptverzeichnis:", __dirname);
