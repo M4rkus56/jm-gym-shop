@@ -1,7 +1,6 @@
 {
   "name": "jm-gym-shop",
   "version": "1.0.0",
-  "description": "JM Gym Shop Backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

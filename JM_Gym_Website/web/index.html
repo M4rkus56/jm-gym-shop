@@ -8,11 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://js.stripe.com/v3/"></script>
-    
     <script src="https://www.paypal.com/sdk/js?client-id=AQZqIPM0nKH_Yx6NVKRw6jnyami-Ncok_2X2PWis-zCcBjJZx9aiXfcOEQ-o6bAc4ePUq1jOHUc2s0bv&currency=EUR"></script>
 </head>
 <body>
-
     <div class="ambient-light"></div>
 
     <nav class="glass-nav">
@@ -46,7 +44,6 @@
         <div class="hero-text glass-panel">
             <h2>Unlock Your Potential</h2>
             <h1>JM AESTHETICS</h1>
-            <p>Exklusive Gym-Wear, die Performance mit Eleganz vereint.</p>
             <button class="cta-btn" onclick="document.querySelector('.products').scrollIntoView({behavior: 'smooth'})">Kollektion ansehen</button>
         </div>
     </header>
@@ -58,19 +55,19 @@
                 <div class="product-img-placeholder"></div>
                 <h3>Navy Performance Shirt</h3>
                 <p class="price">49.90 €</p>
-                <button class="add-btn" onclick="addToCart('Navy Performance Shirt', 49.90)">In den Warenkorb</button>
+                <button class="add-btn" onclick="window.addToCart('Navy Performance Shirt', 49.90)">In den Warenkorb</button>
             </div>
             <div class="product-card glass-panel">
                 <div class="product-img-placeholder"></div>
                 <h3>Gold Accent Hoodie</h3>
                 <p class="price">79.90 €</p>
-                <button class="add-btn" onclick="addToCart('Gold Accent Hoodie', 79.90)">In den Warenkorb</button>
+                <button class="add-btn" onclick="window.addToCart('Gold Accent Hoodie', 79.90)">In den Warenkorb</button>
             </div>
             <div class="product-card glass-panel">
                 <div class="product-img-placeholder"></div>
                 <h3>Seamless Leggings JM</h3>
                 <p class="price">54.90 €</p>
-                <button class="add-btn" onclick="addToCart('Seamless Leggings JM', 54.90)">In den Warenkorb</button>
+                <button class="add-btn" onclick="window.addToCart('Seamless Leggings JM', 54.90)">In den Warenkorb</button>
             </div>
         </div>
     </section>
@@ -80,19 +77,14 @@
             <h3>Dein Warenkorb</h3>
             <span class="close-cart" id="close-cart">&times;</span>
         </div>
-        <div class="cart-items" id="cart-items">
-            <p class="empty-cart-msg">Leer.</p>
-        </div>
+        <div class="cart-items" id="cart-items"></div>
         <div class="discount-section">
             <input type="text" id="discount-input" placeholder="Code (z.B. JM10)">
             <button id="apply-discount">Einlösen</button>
         </div>
         <p id="discount-msg"></p>
         <div class="cart-footer">
-            <div class="total-row">
-                <span>Gesamt:</span>
-                <span id="cart-total">0.00 €</span>
-            </div>
+            <div class="total-row"><span>Gesamt:</span><span id="cart-total">0.00 €</span></div>
             <button class="checkout-btn" id="checkout-btn">Zur Kasse</button>
         </div>
     </div>
@@ -100,19 +92,29 @@
     <div id="login-modal" class="modal-overlay">
         <div class="login-box glass-panel">
             <span class="close-modal" id="close-login">&times;</span>
-            <h2>Member Login</h2>
-            <p id="auth-info-text" style="font-size: 0.9rem; margin-bottom: 20px; color:#aaa;">Melde dich an für schnelleren Checkout.</p>
+            <div class="auth-header">
+                <img src="IMG_2951.jpg" alt="Logo" class="auth-logo">
+                <h2 id="auth-title">Willkommen bei JM</h2>
+            </div>
+            <div class="auth-toggles">
+                <button id="tab-login" class="auth-tab active">Einloggen</button>
+                <button id="tab-register" class="auth-tab">Registrieren</button>
+            </div>
+            <div class="social-login">
+                <button class="social-btn"><i class="fab fa-google"></i> Weiter mit Google</button>
+                <button class="social-btn"><i class="fab fa-apple"></i> Weiter mit Apple</button>
+            </div>
+            <div class="divider"><span>ODER</span></div>
             <form id="login-form">
                 <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" id="auth-email" placeholder="E-Mail Adresse" required>
+                    <label>E-Mail Adresse</label>
+                    <input type="email" id="auth-email" placeholder="name@beispiel.com" required>
                 </div>
                 <div class="input-group">
-                    <i class="fas fa-lock"></i>
+                    <label>Passwort</label>
                     <input type="password" id="auth-password" placeholder="Passwort" required>
                 </div>
-                <button type="submit" class="cta-btn login-btn">Einloggen</button>
-                <p class="switch-text"><a href="#" id="toggle-auth">Neu bei JM? Kostenlos registrieren</a></p>
+                <button type="submit" class="cta-btn login-btn main-auth-btn" id="auth-action-btn">Einloggen</button>
             </form>
         </div>
     </div>
@@ -120,41 +122,19 @@
     <div id="checkout-modal" class="modal-overlay">
         <div class="checkout-box glass-panel">
             <span class="close-modal" id="close-checkout">&times;</span>
-            <h2><i class="fas fa-lock"></i> Sicher bezahlen</h2>
-            
+            <h2>Sicher bezahlen</h2>
             <form id="checkout-form">
                 <h4 class="form-heading">Lieferadresse</h4>
-                <div class="form-row">
-                    <input type="text" placeholder="Vorname" required>
-                    <input type="text" placeholder="Nachname" required>
-                </div>
-                <input type="text" placeholder="Straße & Hausnummer" required class="full-width">
-                <div class="form-row three-cols">
-                    <input type="text" placeholder="PLZ" required>
-                    <input type="text" placeholder="Stadt" required>
-                    <input type="text" placeholder="Land" value="Deutschland" required>
-                </div>
-
-                <h4 class="form-heading">Zahlungsart</h4>
-                <div id="paypal-button-container" style="margin-bottom: 20px;"></div>
-                <p class="divider-text">— ODER KARTE / KLARNA —</p>
+                <div class="form-row"><input type="text" placeholder="Vorname"><input type="text" placeholder="Nachname"></div>
+                <input type="text" placeholder="Straße & Hausnummer" class="full-width">
+                <div class="form-row three-cols"><input type="text" placeholder="PLZ"><input type="text" placeholder="Stadt"><input type="text" placeholder="Land"></div>
+                <h4 class="form-heading">Zahlung</h4>
+                <div id="paypal-button-container" style="margin-bottom:20px;"></div>
                 <div id="stripe-payment-element" class="stripe-box"></div>
-                <div id="payment-message" style="color: #ff4444; display: none; margin-top: 10px;"></div>
-
-                <div class="total-summary">
-                    <p>Summe: <strong id="checkout-total-amount">0.00 €</strong></p>
-                </div>
-
-                <button type="submit" class="pay-now-btn" id="submit-payment">Kostenpflichtig bestellen</button>
+                <div id="payment-message" style="color:#ff4444;display:none;"></div>
+                <div class="total-summary"><p>Summe: <strong id="checkout-total-amount">0.00 €</strong></p></div>
+                <button type="submit" class="pay-now-btn" id="submit-payment">Bezahlen</button>
             </form>
-        </div>
-    </div>
-
-    <div id="promo-popup" class="popup glass-panel">
-        <button id="close-popup" class="close-btn">&times;</button>
-        <div class="popup-content">
-            <h3>Willkommen bei JM</h3>
-            <p>Code <strong>JM10</strong> für 10% Rabatt!</p>
         </div>
     </div>
 
