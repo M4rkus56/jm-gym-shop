@@ -17,19 +17,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     if(!sessionStorage.getItem('popupClosed')) setTimeout(() => document.getElementById('promo-popup').classList.add('show'), 2500);
 });
 
-// --- AUTH ---
-document.getElementById('toggle-auth').addEventListener('click', (e) => {
-    e.preventDefault(); isRegisterMode = !isRegisterMode;
-    const title = document.getElementById('auth-title');
-    const sub = document.getElementById('auth-subtitle');
-    const btn = document.getElementById('auth-btn');
-    const switchT = document.getElementById('switch-text');
-    const link = document.getElementById('toggle-auth');
-    if(isRegisterMode) {
-        title.innerText = "Join the Club"; sub.innerText = "Erstelle deinen Account."; btn.innerText = "Registrieren"; switchT.innerText = "Schon dabei?"; link.innerText = "Login";
-    } else {
-        title.innerText = "Member Login"; sub.innerText = "Willkommen zurück."; btn.innerText = "Einloggen"; switchT.innerText = "Neu bei JM?"; link.innerText = "Account erstellen";
-    }
+// --- NEUE AUTH LOGIK (Tabs) ---
+const tabLogin = document.getElementById('tab-login');
+const tabRegister = document.getElementById('tab-register');
+const authBtn = document.getElementById('auth-action-btn');
+
+tabLogin.addEventListener('click', () => {
+    isRegisterMode = false;
+    tabLogin.classList.add('active');
+    tabRegister.classList.remove('active');
+    authBtn.innerText = "Einloggen";
+});
+
+tabRegister.addEventListener('click', () => {
+    isRegisterMode = true;
+    tabRegister.classList.add('active');
+    tabLogin.classList.remove('active');
+    authBtn.innerText = "Registrieren";
 });
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -37,14 +41,24 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
     const endpoint = isRegisterMode ? "/register" : "/login";
+    
     try {
         const res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
         const data = await res.json();
+        
         if (res.ok) {
-            if (isRegisterMode) { alert("Registriert! Bitte einloggen."); document.getElementById('toggle-auth').click(); }
-            else { localStorage.setItem('token', data.token); localStorage.setItem('user', data.email); alert("Willkommen!"); loginModal.style.display = 'none'; checkLoginStatus(); }
+            if (isRegisterMode) { 
+                alert("Account erstellt! Bitte jetzt einloggen."); 
+                tabLogin.click(); // Wechsel zum Login Tab
+            } else { 
+                localStorage.setItem('token', data.token); 
+                localStorage.setItem('user', data.email); 
+                alert("Willkommen zurück!"); 
+                loginModal.style.display = 'none'; 
+                checkLoginStatus(); 
+            }
         } else { alert(data.message); }
-    } catch (err) { alert("Fehler"); }
+    } catch (err) { alert("Server Fehler"); }
 });
 
 function checkLoginStatus() {
@@ -58,6 +72,7 @@ function checkLoginStatus() {
     }
 }
 
+// Schließen
 document.getElementById('close-login').addEventListener('click', () => loginModal.style.display = 'none');
 document.getElementById('close-checkout').addEventListener('click', () => checkoutModal.style.display = 'none');
 document.getElementById('close-popup').addEventListener('click', () => { document.getElementById('promo-popup').classList.remove('show'); sessionStorage.setItem('popupClosed', 'true'); });
