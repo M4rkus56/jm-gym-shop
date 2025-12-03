@@ -19,7 +19,7 @@
             <span class="brand-name">JM</span>
         </div>
         <ul class="nav-links">
-            <li><a href="#">Home</a></li>
+            <li><a href="/">Home</a></li>
             <li class="dropdown">
                 <a href="#">Kollektion <i class="fas fa-chevron-down"></i></a>
                 <div class="dropdown-content glass-panel">
@@ -28,7 +28,7 @@
                     <a href="#">Gold Edition</a>
                 </div>
             </li>
-            <li><a href="#">About</a></li>
+            <li><a href="/kontakt">Kontakt</a></li>
         </ul>
         <div class="nav-icons">
             <i class="fas fa-search"></i>
@@ -115,6 +115,7 @@
                     <input type="password" id="auth-password" placeholder="Passwort" required>
                 </div>
                 <button type="submit" class="cta-btn login-btn main-auth-btn" id="auth-action-btn">Einloggen</button>
+                <div class="form-footer"><a href="#">Passwort vergessen?</a></div>
             </form>
         </div>
     </div>
@@ -133,10 +134,37 @@
                 <div id="stripe-payment-element" class="stripe-box"></div>
                 <div id="payment-message" style="color:#ff4444;display:none;"></div>
                 <div class="total-summary"><p>Summe: <strong id="checkout-total-amount">0.00 €</strong></p></div>
-                <button type="submit" class="pay-now-btn" id="submit-payment">Bezahlen</button>
+                <button type="submit" class="pay-now-btn" id="submit-payment">Kostenpflichtig bestellen</button>
             </form>
         </div>
     </div>
+
+    <div id="promo-popup" class="popup glass-panel">
+        <button id="close-popup" class="close-btn">&times;</button>
+        <div class="popup-content"><h3>Willkommen bei JM</h3><p>Code <strong>JM10</strong> für 10% Rabatt!</p></div>
+    </div>
+
+    <footer class="glass-footer">
+        <div class="footer-content">
+            <div class="footer-top">
+                <div class="brand-name">JM ÉLITE</div>
+                <div class="payment-methods">
+                    <i class="fab fa-paypal"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-visa"></i><i class="fab fa-apple-pay"></i><span class="klarna-badge">Klarna.</span>
+                </div>
+            </div>
+            <div class="footer-bottom-line">
+                <div class="copyright">&copy; 2025 | JM ÉLITE Limited | Alle Rechte vorbehalten.</div>
+                <div class="legal-links">
+                    <a href="/agb">AGB</a>
+                    <a href="/impressum">Impressum</a>
+                    <a href="/datenschutz">Datenschutz</a>
+                    <a href="/widerruf">Widerruf</a>
+                    <a href="/versand">Versand</a>
+                    <a href="/kontakt">Kontakt</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>

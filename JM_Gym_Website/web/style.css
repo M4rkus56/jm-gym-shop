@@ -17,7 +17,7 @@ body { font-family: 'Montserrat', sans-serif; background: radial-gradient(circle
 .cart-icon-wrapper { position: relative; cursor: pointer; }
 .cart-count { position: absolute; top: -8px; right: -8px; background: var(--accent-gold); color: #000; font-size: 0.7rem; padding: 2px 6px; border-radius: 50%; font-weight: bold; }
 
-/* Hero & Product */
+/* Hero & Products */
 .hero { height: 80vh; display: flex; align-items: center; justify-content: center; position: relative; background: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop') center/cover no-repeat; }
 .hero::before { content: ''; position: absolute; inset: 0; background: rgba(8, 18, 33, 0.6); }
 .hero-text { position: relative; text-align: center; padding: 3rem; border-radius: 20px; max-width: 700px; }
@@ -27,23 +27,21 @@ body { font-family: 'Montserrat', sans-serif; background: radial-gradient(circle
 .products { padding: 50px 5%; text-align: center; }
 .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
 .product-card { padding: 20px; border-radius: 15px; transition: 0.3s; text-align: left; }
+.product-card:hover { transform: translateY(-10px); border-color: var(--accent-gold); }
 .product-img-placeholder { height: 250px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 15px; }
 .add-btn { width: 100%; padding: 10px; margin-top: 10px; background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); border-radius: 5px; cursor: pointer; transition: 0.3s; }
 .add-btn:hover { background: var(--accent-gold); color: var(--bg-dark); }
 
-/* Cart */
+/* Cart & Login & Checkout */
 .cart-sidebar { position: fixed; top: 0; right: 0; width: 350px; height: 100%; z-index: 2000; padding: 20px; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.4s ease-in-out; }
 .cart-sidebar.open { transform: translateX(0); }
 .cart-header { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
 .close-cart { font-size: 1.5rem; cursor: pointer; }
 .cart-items { flex: 1; overflow-y: auto; margin: 20px 0; }
 .cart-item { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 0.9rem; }
-.discount-section { display: flex; gap: 10px; margin-bottom: 10px; }
-input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; outline: none; margin-bottom: 10px; }
+input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #1a1a1a; color: white; outline: none; margin-bottom: 10px; }
 input:focus { border-color: var(--accent-gold); }
-.checkout-btn, .pay-now-btn { width: 100%; padding: 14px; background: var(--accent-gold); border: none; color: var(--bg-dark); font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; font-size: 1rem; }
-
-/* Login - Spotify Style */
+.checkout-btn, .pay-now-btn, .main-auth-btn { width: 100%; padding: 14px; background: var(--accent-gold); border: none; color: var(--bg-dark); font-weight: bold; cursor: pointer; border-radius: 8px; margin-top: 10px; font-size: 1rem; }
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; justify-content: center; align-items: center; padding: 20px; }
 .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #aaa; }
 .login-box { width: 450px; padding: 40px; border-radius: 12px; text-align: center; position: relative; background: rgba(12, 24, 44, 0.98); }
@@ -51,7 +49,7 @@ input:focus { border-color: var(--accent-gold); }
 .auth-logo { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--accent-gold); margin-bottom: 15px; display:inline-block; }
 .auth-header h2 { font-size: 1.8rem; font-weight: 700; margin:0; }
 .auth-toggles { display: flex; justify-content: center; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); gap: 20px; }
-.auth-tab { background: none; border: none; color: #aaa; font-size: 1rem; font-weight: 600; padding: 10px 20px; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.3s; }
+.auth-tab { background: none; border: none; color: #aaa; font-size: 1rem; font-weight: 600; padding: 10px 20px; cursor: pointer; border-bottom: 3px solid transparent; }
 .auth-tab.active { color: white; border-bottom: 3px solid var(--accent-gold); }
 .social-login { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
 .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 12px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.3s; }
@@ -59,19 +57,32 @@ input:focus { border-color: var(--accent-gold); }
 .divider { display: flex; align-items: center; margin: 20px 0; color: #aaa; font-size: 0.8rem; font-weight: bold; }
 .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,0.1); margin: 0 10px; }
 .input-group { text-align: left; margin-bottom: 15px; }
-.input-group label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 5px; margin-left: 5px; }
-.input-group input { background: #1a1a1a; }
-.main-auth-btn { width: 100%; padding: 14px; border-radius: 30px; background: var(--accent-gold); color: #000; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
-
-/* Checkout */
+.form-footer { margin-top: 20px; font-size: 0.9rem; }
+.form-footer a { color: white; text-decoration: none; }
 .checkout-box { width: 700px; max-width: 100%; padding: 40px; position: relative; max-height: 95vh; overflow-y: auto; border-radius: 20px; }
 .checkout-box h2 { margin-bottom: 20px; color: var(--accent-gold); text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-.form-heading { margin: 25px 0 15px; color: var(--text-light); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
 .form-row { display: flex; gap: 15px; }
 .full-width { width: 100%; }
 .stripe-box { padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(0,0,0,0.2); }
-.total-summary { margin: 20px 0; text-align: right; font-size: 1.4rem; }
+.popup { position: fixed; bottom: 20px; right: 20px; width: 300px; padding: 20px; border-radius: 20px; z-index: 2000; opacity: 0; transform: translateY(100px); transition: all 0.6s ease; pointer-events: none; }
+.popup.show { opacity: 1; transform: translateY(0); pointer-events: all; }
 .dropdown { position: relative; }
 .dropdown-content { display: none; position: absolute; top: 100%; left: 0; flex-direction: column; min-width: 200px; border-radius: 10px; margin-top: 10px; }
 .dropdown:hover .dropdown-content { display: flex; }
 .dropdown-content a { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+/* Footer - Gymshark Style */
+.footer-top { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
+.footer-bottom-line { border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; font-size: 0.8rem; color: #888; }
+.legal-links { display: flex; gap: 20px; }
+.legal-links a { color: #aaa; text-decoration: none; font-weight: 500; transition: color 0.3s; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+.legal-links a:hover { color: var(--accent-gold); }
+@media (max-width: 768px) { .footer-bottom-line { flex-direction: column-reverse; gap: 20px; text-align: center; } .legal-links { flex-wrap: wrap; justify-content: center; gap: 15px; } }
+
+/* Rechtstexte Seiten */
+.content-page { padding: 120px 20px 60px; max-width: 800px; margin: 0 auto; min-height: 100vh; }
+.legal-content { padding: 40px; text-align: left; line-height: 1.6; }
+.legal-content h1 { color: var(--accent-gold); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px; }
+.legal-content h2, .legal-content h3 { color: white; margin-top: 30px; margin-bottom: 15px; }
+.legal-content p, .legal-content li { color: #ccc; margin-bottom: 10px; }
+.legal-box { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); margin-top: 20px; }
