@@ -114,3 +114,36 @@ function checkLoginStatus() {
         icon.onclick = (e) => { e.stopImmediatePropagation(); if(confirm("Ausloggen?")) { localStorage.clear(); location.reload(); } };
     }
 }
+// --- COOKIE LOGIK ---
+document.addEventListener("DOMContentLoaded", () => {
+    const cookieBanner = document.getElementById('cookie-banner');
+    const acceptBtn = document.getElementById('cookie-accept');
+    const declineBtn = document.getElementById('cookie-decline');
+
+    // 1. Prüfen: Hat der User schon entschieden?
+    if (!localStorage.getItem('cookieConsent')) {
+        // Wenn nein: Banner anzeigen (nach kurzer Verzögerung für schöneren Effekt)
+        setTimeout(() => {
+            cookieBanner.classList.add('show');
+        }, 1000);
+    }
+
+    // 2. Funktion: Akzeptieren
+    if (acceptBtn) {
+        acceptBtn.addEventListener('click', () => {
+            localStorage.setItem('cookieConsent', 'accepted');
+            cookieBanner.classList.remove('show');
+            // Hier könntest du später Analytics-Scripts laden (z.B. Google Analytics)
+            console.log("Cookies akzeptiert.");
+        });
+    }
+
+    // 3. Funktion: Ablehnen (Nur Essentielle)
+    if (declineBtn) {
+        declineBtn.addEventListener('click', () => {
+            localStorage.setItem('cookieConsent', 'declined');
+            cookieBanner.classList.remove('show');
+            console.log("Nur essentielle Cookies.");
+        });
+    }
+});
