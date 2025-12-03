@@ -14,7 +14,7 @@ const app = express();
 // --- 1. PFAD ZUM FRONTEND ---
 const publicPath = path.join(__dirname, 'web');
 
-console.log("--- SERVER START CHECK ---");
+console.log("--- SERVER START ---");
 try {
     if (fs.existsSync(publicPath)) {
         console.log("✅ Ordner 'web' gefunden.");
@@ -46,7 +46,7 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static(publicPath));
 
-// --- 5. SEITEN ROUTEN (Hauptseite & Rechtliches) ---
+// --- 5. ROUTEN ---
 app.get("/", (req, res) => res.sendFile(path.join(publicPath, "index.html")));
 app.get("/impressum", (req, res) => res.sendFile(path.join(publicPath, "impressum.html")));
 app.get("/agb", (req, res) => res.sendFile(path.join(publicPath, "agb.html")));
@@ -55,7 +55,7 @@ app.get("/versand", (req, res) => res.sendFile(path.join(publicPath, "versand.ht
 app.get("/kontakt", (req, res) => res.sendFile(path.join(publicPath, "kontakt.html")));
 app.get("/datenschutz", (req, res) => res.sendFile(path.join(publicPath, "datenschutz.html")));
 
-// --- 6. AUTH ROUTEN ---
+// Auth
 app.post("/register", async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -80,7 +80,7 @@ app.post("/login", async (req, res) => {
     } catch (e) { res.status(500).json({ message: "Fehler" }); }
 });
 
-// --- 7. PAYMENT ROUTEN ---
+// Payment
 app.get("/config", (req, res) => res.send({ stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY }));
 
 app.post("/create-payment-intent", async (req, res) => {
@@ -90,4 +90,31 @@ app.post("/create-payment-intent", async (req, res) => {
             currency: "eur", amount: Math.round(amount * 100), automatic_payment_methods: { enabled: true }
         });
         res.send({ clientSecret: paymentIntent.client_secret });
-    } catch (e) { res.
+    } catch (e) { res.status(400).send({ error: { message: e.message } }); }
+});
+
+app.post("/create-paypal-order", async (req, res) => {
+    const request = new paypal.orders.OrdersCreateRequest();
+    request.prefer("return=representation");
+    request.requestBody({
+        intent: "CAPTURE",
+        purchase_units: [{ amount: { currency_code: "EUR", value: req.body.amount.toFixed(2) } }]
+    });
+    try {
+        const order = await paypalClient.execute(request);
+        res.json({ id: order.result.id });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post("/capture-paypal-order", async (req, res) => {
+    const request = new paypal.orders.OrdersCaptureRequest(req.body.orderID);
+    request.requestBody({});
+    try {
+        const capture = await paypalClient.execute(request);
+        res.json({ status: "success", details: capture.result });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// DIESER TEIL HAT BEI DIR GEFEHLT:
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
