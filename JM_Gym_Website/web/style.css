@@ -86,3 +86,46 @@ input:focus { border-color: var(--accent-gold); }
 .legal-content h2, .legal-content h3 { color: white; margin-top: 30px; margin-bottom: 15px; }
 .legal-content p, .legal-content li { color: #ccc; margin-bottom: 10px; }
 .legal-box { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); margin-top: 20px; }
+/* --- FARBIGE ZAHLUNGS-LOGOS --- */
+
+.payment-methods i {
+    font-size: 2.2rem;
+    margin: 0 10px;
+    transition: transform 0.2s;
+}
+
+.payment-methods i:hover {
+    transform: scale(1.1);
+}
+
+/* PayPal Blau */
+.fa-paypal {
+    color: #003087; 
+    text-shadow: 0 0 10px rgba(0, 48, 135, 0.4);
+}
+
+/* Mastercard Rot/Orange */
+.fa-cc-mastercard {
+    color: #eb001b;
+    text-shadow: 0 0 10px rgba(235, 0, 27, 0.4);
+}
+
+/* Visa Blau */
+.fa-cc-visa {
+    color: #1a1f71;
+    text-shadow: 0 0 10px rgba(26, 31, 113, 0.4);
+}
+
+/* Apple Pay (Weiß leuchtend) */
+.fa-apple-pay {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
+/* Klarna Pink */
+.klarna-badge {
+    color: #ffb3c7;
+    font-weight: 900;
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px rgba(255, 179, 199, 0.4);
+}
