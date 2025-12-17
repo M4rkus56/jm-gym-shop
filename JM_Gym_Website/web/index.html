@@ -18,7 +18,8 @@
             <img src="IMG_2951.jpg" alt="JM Logo" class="nav-logo">
             <span class="brand-name">JM</span>
         </div>
-        <ul class="nav-links">
+        
+        <ul class="nav-links" id="nav-links">
             <li><a href="/">Home</a></li>
             <li class="dropdown">
                 <a href="#">Kollektion <i class="fas fa-chevron-down"></i></a>
@@ -32,12 +33,16 @@
             </li>
             <li><a href="/kontakt">Kontakt</a></li>
         </ul>
+
         <div class="nav-icons">
             <i class="fas fa-search"></i>
             <i class="fas fa-user" id="login-btn-trigger" title="Login"></i>
             <div class="cart-icon-wrapper" id="cart-btn">
                 <i class="fas fa-shopping-bag"></i>
                 <span class="cart-count">0</span>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <i class="fas fa-bars"></i>
             </div>
         </div>
     </nav>
@@ -76,37 +81,19 @@
     </section>
 
     <div class="cart-sidebar glass-panel" id="cart-sidebar">
-        <div class="cart-header">
-            <h3>Dein Warenkorb</h3>
-            <span class="close-cart" id="close-cart">&times;</span>
-        </div>
+        <div class="cart-header"><h3>Dein Warenkorb</h3><span class="close-cart" id="close-cart">&times;</span></div>
         <div class="cart-items" id="cart-items"></div>
-        <div class="discount-section">
-            <input type="text" id="discount-input" placeholder="Code (z.B. JM10)">
-            <button id="apply-discount">Einlösen</button>
-        </div>
+        <div class="discount-section"><input type="text" id="discount-input" placeholder="Code (z.B. JM10)"><button id="apply-discount">Einlösen</button></div>
         <p id="discount-msg"></p>
-        <div class="cart-footer">
-            <div class="total-row"><span>Gesamt:</span><span id="cart-total">0.00 €</span></div>
-            <button class="checkout-btn" id="checkout-btn">Zur Kasse</button>
-        </div>
+        <div class="cart-footer"><div class="total-row"><span>Gesamt:</span><span id="cart-total">0.00 €</span></div><button class="checkout-btn" id="checkout-btn">Zur Kasse</button></div>
     </div>
 
     <div id="login-modal" class="modal-overlay">
         <div class="login-box glass-panel">
             <span class="close-modal" id="close-login">&times;</span>
-            <div class="auth-header">
-                <img src="IMG_2951.jpg" alt="Logo" class="auth-logo">
-                <h2 id="auth-title">Willkommen bei JM</h2>
-            </div>
-            <div class="auth-toggles">
-                <button id="tab-login" class="auth-tab active">Einloggen</button>
-                <button id="tab-register" class="auth-tab">Registrieren</button>
-            </div>
-            <div class="social-login">
-                <button class="social-btn"><i class="fab fa-google"></i> Weiter mit Google</button>
-                <button class="social-btn"><i class="fab fa-apple"></i> Weiter mit Apple</button>
-            </div>
+            <div class="auth-header"><img src="IMG_2951.jpg" alt="Logo" class="auth-logo"><h2 id="auth-title">Willkommen bei JM</h2></div>
+            <div class="auth-toggles"><button id="tab-login" class="auth-tab active">Einloggen</button><button id="tab-register" class="auth-tab">Registrieren</button></div>
+            <div class="social-login"><button class="social-btn"><i class="fab fa-google"></i> Weiter mit Google</button><button class="social-btn"><i class="fab fa-apple"></i> Weiter mit Apple</button></div>
             <div class="divider"><span>ODER</span></div>
             <form id="login-form">
                 <div class="input-group"><label>E-Mail Adresse</label><input type="email" id="auth-email" placeholder="E-Mail" required></div>
@@ -124,7 +111,7 @@
             <form id="checkout-form">
                 <h4 class="form-heading">Lieferadresse</h4>
                 <div class="form-row"><input type="text" placeholder="Vorname"><input type="text" placeholder="Nachname"></div>
-                <input type="text" placeholder="Straße & Hausnummer" class="full-width">
+                <input type="text" placeholder="Straße" class="full-width">
                 <div class="form-row three-cols"><input type="text" placeholder="PLZ"><input type="text" placeholder="Stadt"><input type="text" placeholder="Land"></div>
                 <h4 class="form-heading">Zahlung</h4>
                 <div id="paypal-button-container" style="margin-bottom:20px;"></div>
@@ -138,7 +125,7 @@
     <div id="cookie-banner" class="cookie-banner glass-panel">
         <div class="cookie-content">
             <h3>🍪 Wir nutzen Cookies</h3>
-            <p>Wir nutzen Cookies, um dir das beste Einkaufserlebnis zu bieten. Mehr Infos in unserer <a href="/datenschutz">Datenschutzerklärung</a>.</p>
+            <p>Wir nutzen Cookies für dein Einkaufserlebnis. <a href="/datenschutz">Datenschutz</a>.</p>
         </div>
         <div class="cookie-buttons">
             <button id="cookie-decline" class="cookie-btn-outline">Nur Notwendige</button>
@@ -150,20 +137,11 @@
         <div class="footer-content">
             <div class="footer-top">
                 <div class="brand-name">JM ÉLITE</div>
-                <div class="payment-methods">
-                    <i class="fab fa-paypal"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-visa"></i><i class="fab fa-apple-pay"></i><span class="klarna-badge">Klarna.</span>
-                </div>
+                <div class="payment-methods"><i class="fab fa-paypal"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-visa"></i><i class="fab fa-apple-pay"></i><span class="klarna-badge">Klarna.</span></div>
             </div>
             <div class="footer-bottom-line">
                 <div class="copyright">&copy; 2025 | JM ÉLITE Limited | Alle Rechte vorbehalten.</div>
-                <div class="legal-links">
-                    <a href="/agb">AGB</a>
-                    <a href="/impressum">Impressum</a>
-                    <a href="/datenschutz">Datenschutz</a>
-                    <a href="/widerruf">Widerruf</a>
-                    <a href="/versand">Versand</a>
-                    <a href="/kontakt">Kontakt</a>
-                </div>
+                <div class="legal-links"><a href="/agb">AGB</a><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a><a href="/widerruf">Widerruf</a><a href="/versand">Versand</a><a href="/kontakt">Kontakt</a></div>
             </div>
         </div>
     </footer>

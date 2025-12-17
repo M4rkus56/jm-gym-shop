@@ -74,7 +74,7 @@ input:focus { border-color: var(--accent-gold); }
 .full-width { width: 100%; }
 .stripe-box { padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(0,0,0,0.2); }
 
-/* --- FOOTER FIXED (Mehr Abstand) --- */
+/* --- FOOTER FIXED --- */
 .glass-footer { margin-top: 80px; padding-bottom: 50px; }
 .footer-content { max-width: 1200px; margin: 0 auto; text-align: center; }
 .footer-top { display: flex; flex-direction: column; align-items: center; margin-bottom: 50px; }
@@ -89,9 +89,8 @@ input:focus { border-color: var(--accent-gold); }
 .fa-cc-visa { color: #1a1f71; text-shadow: 0 0 10px rgba(26, 31, 113, 0.4); }
 .fa-apple-pay { color: #fff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.6); }
 .klarna-badge { color: #ffb3c7; font-weight: 900; font-size: 1.5rem; text-shadow: 0 0 10px rgba(255, 179, 199, 0.4); }
-@media (max-width: 768px) { .footer-bottom-line { flex-direction: column-reverse; gap: 25px; text-align: center; } .legal-links { justify-content: center; flex-wrap: wrap; } }
 
-/* --- COOKIE POPUP (Repariert & Mittig) --- */
+/* --- COOKIE POPUP FIXED --- */
 .cookie-banner { position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; padding: 30px; border-radius: 20px; z-index: 9999; background: rgba(12, 24, 44, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--accent-gold); box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 20px; transition: bottom 0.6s cubic-bezier(0.19, 1, 0.22, 1); }
 .cookie-banner.show { bottom: 30px; }
 .cookie-content h3 { color: var(--accent-gold); margin-bottom: 10px; font-size: 1.3rem; text-align: center; }
@@ -110,3 +109,23 @@ input:focus { border-color: var(--accent-gold); }
 .legal-content h2, .legal-content h3 { color: white; margin-top: 30px; margin-bottom: 15px; }
 .legal-content p, .legal-content li { color: #ccc; margin-bottom: 10px; }
 .legal-box { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); margin-top: 20px; }
+
+/* --- MOBILE OPTIMIERUNG (NEU) --- */
+.hamburger { display: none; cursor: pointer; font-size: 1.5rem; color: white; margin-left: 20px; }
+@media (max-width: 768px) {
+    .hamburger { display: block; }
+    .nav-links { position: fixed; top: 70px; right: -100%; width: 100%; height: calc(100vh - 70px); background: rgba(8, 18, 33, 0.98); backdrop-filter: blur(20px); flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 50px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; }
+    .nav-links.nav-active { right: 0; }
+    .nav-links li { margin: 20px 0; opacity: 0; animation: navLinkFade 0.5s ease forwards 0.3s; }
+    .nav-links a { font-size: 1.5rem; }
+    .dropdown-content { position: static; transform: none; background: transparent; border: none; box-shadow: none; text-align: center; padding-top: 10px; display: none; }
+    .dropdown:hover .dropdown-content { display: flex; }
+    .hero-text h1 { font-size: 2.2rem; }
+    .product-grid { grid-template-columns: 1fr; padding: 0 20px; }
+    .login-box, .checkout-box { width: 100%; height: 100%; border-radius: 0; max-height: 100vh; overflow-y: scroll; padding: 20px; display: flex; flex-direction: column; justify-content: center; }
+    .close-modal { top: 20px; right: 20px; font-size: 2rem; z-index: 10; }
+    .cart-sidebar { width: 100%; }
+    .footer-bottom-line { flex-direction: column-reverse; gap: 20px; }
+    .legal-links { flex-wrap: wrap; justify-content: center; }
+}
+@keyframes navLinkFade { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }

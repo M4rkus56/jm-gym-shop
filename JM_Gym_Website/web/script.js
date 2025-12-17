@@ -8,7 +8,6 @@ const cartCountElement = document.querySelector('.cart-count');
 const checkoutModal = document.getElementById('checkout-modal');
 const loginModal = document.getElementById('login-modal');
 
-// --- INIT ---
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const response = await fetch("/config");
@@ -61,7 +60,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if(checkBtn) checkBtn.addEventListener('click', async () => {
         if(cart.length === 0) return alert("Warenkorb leer");
         cartSidebar.classList.remove('open'); checkoutModal.style.display='flex';
-        document.getElementById('checkout-total-amount').innerText = total.toFixed(2) + ' €';
+        // Falls auf Checkout Seite:
+        const totalEl = document.getElementById('checkout-total-amount');
+        if(totalEl) totalEl.innerText = total.toFixed(2) + ' €';
         
         const res = await fetch("/create-payment-intent", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({amount:total}) });
         const {clientSecret} = await res.json();
@@ -76,14 +77,55 @@ document.addEventListener("DOMContentLoaded", async () => {
         }).render('#paypal-button-container');
     });
 
-    document.getElementById('checkout-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const { error } = await stripe.confirmPayment({ elements, confirmParams: { return_url: window.location.href } });
-        if(error) alert(error.message);
-    });
+    const checkoutForm = document.getElementById('checkout-form');
+    if(checkoutForm) {
+        checkoutForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const { error } = await stripe.confirmPayment({ elements, confirmParams: { return_url: window.location.href } });
+            if(error) alert(error.message);
+        });
+    }
+
+    // --- COOKIE LOGIK ---
+    const cookieBanner = document.getElementById('cookie-banner');
+    const acceptBtn = document.getElementById('cookie-accept');
+    const declineBtn = document.getElementById('cookie-decline');
+
+    if (!localStorage.getItem('cookieConsent') && cookieBanner) {
+        setTimeout(() => { cookieBanner.classList.add('show'); }, 1000);
+    }
+    if (acceptBtn) {
+        acceptBtn.addEventListener('click', () => {
+            localStorage.setItem('cookieConsent', 'accepted');
+            cookieBanner.classList.remove('show');
+        });
+    }
+    if (declineBtn) {
+        declineBtn.addEventListener('click', () => {
+            localStorage.setItem('cookieConsent', 'declined');
+            cookieBanner.classList.remove('show');
+        });
+    }
+
+    // --- MOBILE MENU LOGIK ---
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('nav-links');
+    const navLinksItems = document.querySelectorAll('.nav-links li');
+
+    if(hamburger && navLinks) {
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('nav-active');
+            hamburger.querySelector('i').classList.toggle('fa-bars');
+            hamburger.querySelector('i').classList.toggle('fa-times');
+            navLinksItems.forEach((link, index) => {
+                if (link.style.animation) link.style.animation = '';
+                else link.style.animation = `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`;
+            });
+        });
+    }
 });
 
-// Globale Funktionen für HTML onclick
+// Globale Funktionen
 window.addToCart = function(n, p) { cart.push({name:n, price:p}); updateCartDisplay(); if(cartSidebar) cartSidebar.classList.add('open'); }
 window.removeFromCart = function(i) { cart.splice(i, 1); updateCartDisplay(); }
 
@@ -114,36 +156,3 @@ function checkLoginStatus() {
         icon.onclick = (e) => { e.stopImmediatePropagation(); if(confirm("Ausloggen?")) { localStorage.clear(); location.reload(); } };
     }
 }
-// --- COOKIE LOGIK ---
-document.addEventListener("DOMContentLoaded", () => {
-    const cookieBanner = document.getElementById('cookie-banner');
-    const acceptBtn = document.getElementById('cookie-accept');
-    const declineBtn = document.getElementById('cookie-decline');
-
-    // 1. Prüfen: Hat der User schon entschieden?
-    if (!localStorage.getItem('cookieConsent')) {
-        // Wenn nein: Banner anzeigen (nach kurzer Verzögerung für schöneren Effekt)
-        setTimeout(() => {
-            cookieBanner.classList.add('show');
-        }, 1000);
-    }
-
-    // 2. Funktion: Akzeptieren
-    if (acceptBtn) {
-        acceptBtn.addEventListener('click', () => {
-            localStorage.setItem('cookieConsent', 'accepted');
-            cookieBanner.classList.remove('show');
-            // Hier könntest du später Analytics-Scripts laden (z.B. Google Analytics)
-            console.log("Cookies akzeptiert.");
-        });
-    }
-
-    // 3. Funktion: Ablehnen (Nur Essentielle)
-    if (declineBtn) {
-        declineBtn.addEventListener('click', () => {
-            localStorage.setItem('cookieConsent', 'declined');
-            cookieBanner.classList.remove('show');
-            console.log("Nur essentielle Cookies.");
-        });
-    }
-});
