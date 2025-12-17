@@ -46,8 +46,10 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static(publicPath));
 
-// --- 5. ROUTEN ---
+// --- 5. SEITEN ROUTEN ---
 app.get("/", (req, res) => res.sendFile(path.join(publicPath, "index.html")));
+// WICHTIG: Diese Zeile muss da sein!
+app.get("/mens-performance", (req, res) => res.sendFile(path.join(publicPath, "mens-performance.html"))); 
 app.get("/impressum", (req, res) => res.sendFile(path.join(publicPath, "impressum.html")));
 app.get("/agb", (req, res) => res.sendFile(path.join(publicPath, "agb.html")));
 app.get("/widerruf", (req, res) => res.sendFile(path.join(publicPath, "widerruf.html")));
@@ -55,7 +57,7 @@ app.get("/versand", (req, res) => res.sendFile(path.join(publicPath, "versand.ht
 app.get("/kontakt", (req, res) => res.sendFile(path.join(publicPath, "kontakt.html")));
 app.get("/datenschutz", (req, res) => res.sendFile(path.join(publicPath, "datenschutz.html")));
 
-// Auth
+// --- 6. AUTH & API ---
 app.post("/register", async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -115,6 +117,5 @@ app.post("/capture-paypal-order", async (req, res) => {
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// DIESER TEIL HAT BEI DIR GEFEHLT:
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
