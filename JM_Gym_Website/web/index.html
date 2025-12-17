@@ -23,7 +23,7 @@
             <li class="dropdown">
                 <a href="#">Kollektion <i class="fas fa-chevron-down"></i></a>
                 <div class="dropdown-content glass-panel">
-                    <a href="#">Men's Performance</a>
+                    <a href="/mens-performance">Men's Performance</a>
                     <a href="#">Women's Seamless</a>
                     <a href="#">Gold Edition</a>
                 </div>
@@ -44,6 +44,7 @@
         <div class="hero-text glass-panel">
             <h2>Unlock Your Potential</h2>
             <h1>JM AESTHETICS</h1>
+            <p>Exklusive Gym-Wear, die Performance mit Eleganz vereint.</p>
             <button class="cta-btn" onclick="document.querySelector('.products').scrollIntoView({behavior: 'smooth'})">Kollektion ansehen</button>
         </div>
     </header>
@@ -106,14 +107,8 @@
             </div>
             <div class="divider"><span>ODER</span></div>
             <form id="login-form">
-                <div class="input-group">
-                    <label>E-Mail Adresse</label>
-                    <input type="email" id="auth-email" placeholder="name@beispiel.com" required>
-                </div>
-                <div class="input-group">
-                    <label>Passwort</label>
-                    <input type="password" id="auth-password" placeholder="Passwort" required>
-                </div>
+                <div class="input-group"><label>E-Mail Adresse</label><input type="email" id="auth-email" placeholder="E-Mail" required></div>
+                <div class="input-group"><label>Passwort</label><input type="password" id="auth-password" placeholder="Passwort" required></div>
                 <button type="submit" class="cta-btn login-btn main-auth-btn" id="auth-action-btn">Einloggen</button>
                 <div class="form-footer"><a href="#">Passwort vergessen?</a></div>
             </form>
@@ -133,15 +128,20 @@
                 <div id="paypal-button-container" style="margin-bottom:20px;"></div>
                 <div id="stripe-payment-element" class="stripe-box"></div>
                 <div id="payment-message" style="color:#ff4444;display:none;"></div>
-                <div class="total-summary"><p>Summe: <strong id="checkout-total-amount">0.00 €</strong></p></div>
-                <button type="submit" class="pay-now-btn" id="submit-payment">Kostenpflichtig bestellen</button>
+                <button type="submit" class="pay-now-btn" id="submit-payment">Bezahlen</button>
             </form>
         </div>
     </div>
 
-    <div id="promo-popup" class="popup glass-panel">
-        <button id="close-popup" class="close-btn">&times;</button>
-        <div class="popup-content"><h3>Willkommen bei JM</h3><p>Code <strong>JM10</strong> für 10% Rabatt!</p></div>
+    <div id="cookie-banner" class="cookie-banner glass-panel">
+        <div class="cookie-content">
+            <h3>🍪 Wir nutzen Cookies</h3>
+            <p>Wir nutzen Cookies für dein Einkaufserlebnis. <a href="/datenschutz">Datenschutz</a>.</p>
+        </div>
+        <div class="cookie-buttons">
+            <button id="cookie-decline" class="cookie-btn-outline">Nur Notwendige</button>
+            <button id="cookie-accept" class="cookie-btn-fill">Alles akzeptieren</button>
+        </div>
     </div>
 
     <footer class="glass-footer">
