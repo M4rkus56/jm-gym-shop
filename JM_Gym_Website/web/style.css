@@ -17,11 +17,20 @@ body { font-family: 'Montserrat', sans-serif; background: radial-gradient(circle
 .cart-icon-wrapper { position: relative; cursor: pointer; }
 .cart-count { position: absolute; top: -8px; right: -8px; background: var(--accent-gold); color: #000; font-size: 0.7rem; padding: 2px 6px; border-radius: 50%; font-weight: bold; }
 
+/* --- DROPDOWN MENÜ FIX (Brücke) --- */
+.dropdown { position: relative; height: 100%; display: flex; align-items: center; }
+.dropdown-content { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); flex-direction: column; min-width: 220px; padding-top: 15px; /* Die Brücke */ margin-top: 0; z-index: 1000; }
+.dropdown:hover .dropdown-content { display: flex; }
+.dropdown-content-inner { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column; }
+.dropdown-content a { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); color: white; text-decoration: none; transition: background 0.2s; text-align: left; }
+.dropdown-content a:hover { background: rgba(212, 175, 55, 0.2); color: var(--accent-gold); }
+.dropdown-content a:last-child { border-bottom: none; }
+
 /* Hero & Products */
 .hero { height: 80vh; display: flex; align-items: center; justify-content: center; position: relative; background: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop') center/cover no-repeat; }
 .hero::before { content: ''; position: absolute; inset: 0; background: rgba(8, 18, 33, 0.6); }
 .hero-text { position: relative; text-align: center; padding: 3rem; border-radius: 20px; max-width: 700px; }
-.hero-text h1 { font-size: 3.5rem; margin: 10px 0; background: linear-gradient(to right, #fff, var(--accent-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-text h1 { font-size: 3.5rem; margin: 10px 0; background: linear-gradient(to right, #fff, var(--accent-gold)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .cta-btn { padding: 12px 35px; background: var(--accent-gold); color: var(--bg-dark); border: none; font-weight: bold; border-radius: 30px; cursor: pointer; margin-top: 20px; transition: transform 0.2s; }
 .cta-btn:hover { transform: scale(1.05); }
 .products { padding: 50px 5%; text-align: center; }
@@ -32,7 +41,7 @@ body { font-family: 'Montserrat', sans-serif; background: radial-gradient(circle
 .add-btn { width: 100%; padding: 10px; margin-top: 10px; background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); border-radius: 5px; cursor: pointer; transition: 0.3s; }
 .add-btn:hover { background: var(--accent-gold); color: var(--bg-dark); }
 
-/* Cart & Login & Checkout */
+/* Cart, Login, Checkout */
 .cart-sidebar { position: fixed; top: 0; right: 0; width: 350px; height: 100%; z-index: 2000; padding: 20px; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.4s ease-in-out; }
 .cart-sidebar.open { transform: translateX(0); }
 .cart-header { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
@@ -64,155 +73,16 @@ input:focus { border-color: var(--accent-gold); }
 .form-row { display: flex; gap: 15px; }
 .full-width { width: 100%; }
 .stripe-box { padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(0,0,0,0.2); }
-.popup { position: fixed; bottom: 20px; right: 20px; width: 300px; padding: 20px; border-radius: 20px; z-index: 2000; opacity: 0; transform: translateY(100px); transition: all 0.6s ease; pointer-events: none; }
-.popup.show { opacity: 1; transform: translateY(0); pointer-events: all; }
-.dropdown { position: relative; }
-.dropdown-content { display: none; position: absolute; top: 100%; left: 0; flex-direction: column; min-width: 200px; border-radius: 10px; margin-top: 10px; }
-.dropdown:hover .dropdown-content { display: flex; }
-.dropdown-content a { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-/* Footer - Gymshark Style */
+/* Footer & Legal */
 .footer-top { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
 .footer-bottom-line { border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; font-size: 0.8rem; color: #888; }
 .legal-links { display: flex; gap: 20px; }
 .legal-links a { color: #aaa; text-decoration: none; font-weight: 500; transition: color 0.3s; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
 .legal-links a:hover { color: var(--accent-gold); }
-@media (max-width: 768px) { .footer-bottom-line { flex-direction: column-reverse; gap: 20px; text-align: center; } .legal-links { flex-wrap: wrap; justify-content: center; gap: 15px; } }
-
-/* Rechtstexte Seiten */
-.content-page { padding: 120px 20px 60px; max-width: 800px; margin: 0 auto; min-height: 100vh; }
-.legal-content { padding: 40px; text-align: left; line-height: 1.6; }
-.legal-content h1 { color: var(--accent-gold); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px; }
-.legal-content h2, .legal-content h3 { color: white; margin-top: 30px; margin-bottom: 15px; }
-.legal-content p, .legal-content li { color: #ccc; margin-bottom: 10px; }
-.legal-box { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); margin-top: 20px; }
-/* --- FARBIGE ZAHLUNGS-LOGOS --- */
-
-.payment-methods i {
-    font-size: 2.2rem;
-    margin: 0 10px;
-    transition: transform 0.2s;
-}
-
-.payment-methods i:hover {
-    transform: scale(1.1);
-}
-
-/* PayPal Blau */
-.fa-paypal {
-    color: #003087; 
-    text-shadow: 0 0 10px rgba(0, 48, 135, 0.4);
-}
-
-/* Mastercard Rot/Orange */
-.fa-cc-mastercard {
-    color: #eb001b;
-    text-shadow: 0 0 10px rgba(235, 0, 27, 0.4);
-}
-
-/* Visa Blau */
-.fa-cc-visa {
-    color: #1a1f71;
-    text-shadow: 0 0 10px rgba(26, 31, 113, 0.4);
-}
-
-/* Apple Pay (Weiß leuchtend) */
-.fa-apple-pay {
-    color: #fff;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
-}
-
-/* Klarna Pink */
-.klarna-badge {
-    color: #ffb3c7;
-    font-weight: 900;
-    font-size: 1.5rem;
-    text-shadow: 0 0 10px rgba(255, 179, 199, 0.4);
-}
-/* --- COOKIE BANNER STYLE --- */
-.cookie-banner {
-    position: fixed;
-    bottom: -100%; /* Startet versteckt */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 600px;
-    padding: 25px;
-    border-radius: 16px;
-    z-index: 10000; /* Ganz oben */
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    transition: bottom 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-    background: rgba(12, 24, 44, 0.98); /* Fast blickdicht für Lesbarkeit */
-    border: 1px solid var(--accent-gold);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-}
-
-.cookie-banner.show {
-    bottom: 30px; /* Fährt hoch */
-}
-
-.cookie-content h3 {
-    color: var(--accent-gold);
-    margin-bottom: 10px;
-    font-size: 1.2rem;
-}
-
-.cookie-content p {
-    font-size: 0.9rem;
-    color: #ccc;
-    line-height: 1.5;
-}
-
-.cookie-content a {
-    color: white;
-    text-decoration: underline;
-}
-
-.cookie-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: flex-end;
-}
-
-.cookie-btn-fill {
-    background: var(--accent-gold);
-    color: black;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.cookie-btn-outline {
-    background: transparent;
-    color: #aaa;
-    border: 1px solid #aaa;
-    padding: 10px 25px;
-    border-radius: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.cookie-btn-outline:hover {
-    border-color: white;
-    color: white;
-}
-
-.cookie-btn-fill:hover {
-    transform: scale(1.05);
-}
-
-/* Handy Anpassung */
-@media (max-width: 600px) {
-    .cookie-buttons {
-        flex-direction: column-reverse;
-    }
-    .cookie-btn-outline, .cookie-btn-fill {
-        width: 100%;
-    }
-}
+.payment-methods i { font-size: 2.2rem; margin: 0 10px; transition: transform 0.2s; }
+.payment-methods i:hover { transform: scale(1.1); }
+.fa-paypal { color: #003087; text-shadow: 0 0 10px rgba(0, 48, 135, 0.4); }
+.fa-cc-mastercard { color: #eb001b; text-shadow: 0 0 10px rgba(235, 0, 27, 0.4); }
+.fa-cc-visa { color: #1a1f71; text-shadow: 0 0 10px rgba(26, 31, 113, 0.4); }
+.fa-apple-pay { color: #fff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
