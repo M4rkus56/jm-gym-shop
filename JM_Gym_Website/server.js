@@ -8,81 +8,145 @@ const path = require("path");
 const fs = require('fs');
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const paypal = require("@paypal/checkout-server-sdk");
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 const app = express();
-
-// --- 1. PFAD ZUM FRONTEND ---
 const publicPath = path.join(__dirname, 'web');
 
-console.log("--- SERVER START ---");
-try {
-    if (fs.existsSync(publicPath)) {
-        console.log("✅ Ordner 'web' gefunden.");
-    } else {
-        console.error("❌ KRITISCH: Ordner 'web' nicht gefunden!");
+// --- 1. WARTUNGS-MODUS (Muss ganz oben stehen!) ---
+app.use((req, res, next) => {
+    // Prüft, ob bei Kinsta die Variable MAINTENANCE_MODE auf "true" steht
+    if (process.env.MAINTENANCE_MODE === "true") {
+        // Erlaube Bilder, CSS & JS, damit die Wartungsseite gut aussieht
+        if (req.url.match(/\.(css|js|jpg|png|ico|woff2)$/)) {
+            return next();
+        }
+        // Zeige jedem Besucher die Wartungsseite
+        return res.sendFile(path.join(publicPath, "wartung.html"));
     }
-} catch(e) { console.error(e); }
+    next();
+});
 
 // --- 2. DATENBANK ---
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("✅ MongoDB verbunden!"))
-    .catch(err => console.error("❌ MongoDB Fehler:", err));
+    .then(() => console.log("✅ MongoDB verbunden"))
+    .catch(err => console.error("❌ DB Fehler:", err));
 
 const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String }, // Optional (Google User haben keins)
+    googleId: { type: String }, // Neu: Für Google User
     createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model("User", UserSchema);
 
-// --- 3. PAYPAL ---
-const Environment = paypal.core.SandboxEnvironment;
+// --- 3. PAYPAL SETUP ---
+const Environment = paypal.core.SandboxEnvironment; // Später: LiveEnvironment
 const paypalClient = new paypal.core.PayPalHttpClient(
   new Environment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_CLIENT_SECRET)
 );
 
-// --- 4. MIDDLEWARE ---
+// --- 4. GOOGLE AUTH STRATEGIE ---
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "/auth/google/callback"
+  },
+  async (accessToken, refreshToken, profile, done) => {
+    try {
+        // Prüfen: Gibt es den User schon?
+        let user = await User.findOne({ email: profile.emails[0].value });
+        if (user) {
+            // User existiert -> Google ID nachtragen falls fehlt
+            if (!user.googleId) {
+                user.googleId = profile.id;
+                await user.save();
+            }
+            return done(null, user);
+        } else {
+            // User neu -> Erstellen (ohne Passwort)
+            user = new User({
+                email: profile.emails[0].value,
+                googleId: profile.id
+            });
+            await user.save();
+            return done(null, user);
+        }
+    } catch (err) { return done(err, null); }
+  }
+));
+
+// --- 5. MIDDLEWARE ---
 app.use(express.json());
 app.use(cors());
 app.use(express.static(publicPath));
+app.use(passport.initialize()); // Passport starten
 
-// --- 5. SEITEN ROUTEN ---
+// --- 6. SEITEN ROUTEN ---
 app.get("/", (req, res) => res.sendFile(path.join(publicPath, "index.html")));
-// WICHTIG: Diese Zeile muss da sein!
-app.get("/mens-performance", (req, res) => res.sendFile(path.join(publicPath, "mens-performance.html"))); 
+app.get("/mens-performance", (req, res) => res.sendFile(path.join(publicPath, "mens-performance.html")));
 app.get("/impressum", (req, res) => res.sendFile(path.join(publicPath, "impressum.html")));
 app.get("/agb", (req, res) => res.sendFile(path.join(publicPath, "agb.html")));
 app.get("/widerruf", (req, res) => res.sendFile(path.join(publicPath, "widerruf.html")));
 app.get("/versand", (req, res) => res.sendFile(path.join(publicPath, "versand.html")));
 app.get("/kontakt", (req, res) => res.sendFile(path.join(publicPath, "kontakt.html")));
 app.get("/datenschutz", (req, res) => res.sendFile(path.join(publicPath, "datenschutz.html")));
+// Wartungsseite Route (für Testzwecke)
+app.get("/wartung", (req, res) => res.sendFile(path.join(publicPath, "wartung.html")));
 
-// --- 6. AUTH & API ---
+
+// --- 7. AUTH & LOGIN ROUTEN ---
+
+// A) Google Login Start
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+// B) Google Login Callback (Hier kommt Google zurück)
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { session: false, failureRedirect: '/' }),
+  (req, res) => {
+    // Token erstellen
+    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    // Zurück zur Startseite mit Token in der URL
+    res.redirect(`/?token=${token}&email=${req.user.email}`);
+  }
+);
+
+// C) Normales Registrieren (mit Auto-Login)
 app.post("/register", async (req, res) => {
     const { email, password } = req.body;
     try {
-        const existingUser = await User.findOne({ email });
-        if (existingUser) return res.status(400).json({ message: "E-Mail vergeben." });
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ email, password: hashedPassword });
+        const existing = await User.findOne({ email });
+        if(existing) return res.status(400).json({message:"E-Mail vergeben"});
+        
+        const hashed = await bcrypt.hash(password, 10);
+        const user = new User({ email, password: hashed });
         await user.save();
-        res.status(201).json({ message: "Erstellt" });
-    } catch (e) { res.status(500).json({ message: "Fehler" }); }
+        
+        // Token direkt erstellen
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        res.status(201).json({ message: "Erfolg", token, email: user.email });
+    } catch(e) { res.status(500).json({message:"Fehler"}); }
 });
 
+// D) Normales Login
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: "User nicht gefunden" });
+        if (!user.password) return res.status(400).json({ message: "Bitte mit Google einloggen" });
+        
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: "Falsches Passwort" });
+        
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
         res.json({ token, email: user.email });
     } catch (e) { res.status(500).json({ message: "Fehler" }); }
 });
 
-// Payment
+
+// --- 8. PAYMENT ROUTEN ---
 app.get("/config", (req, res) => res.send({ stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY }));
 
 app.post("/create-payment-intent", async (req, res) => {
@@ -117,5 +181,6 @@ app.post("/capture-paypal-order", async (req, res) => {
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// --- SERVER START ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
