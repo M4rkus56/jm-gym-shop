@@ -4,16 +4,18 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-"cache-clean": "echo 'Cache Cleared'"
+    "cache-clean": "echo 'Cache Cleared'"
   },
   "dependencies": {
+    "@paypal/checkout-server-sdk": "^1.0.3",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.0",
-    "stripe": "^13.10.0",
-    "@paypal/checkout-server-sdk": "^1.0.3"
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "stripe": "^13.10.0"
   }
 }
